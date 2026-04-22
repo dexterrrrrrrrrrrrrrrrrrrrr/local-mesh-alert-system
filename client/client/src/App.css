@@ -1,4 +1,9 @@
 /* Neobrutalist black & white UI */
+:root {
+  --accent-yellow: #ffd84d;
+  --accent-red: #ff4d4d;
+}
+
 .sos-container {
   display: flex;
   justify-content: center;
@@ -64,6 +69,7 @@
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
   margin-bottom: 20px;
+  justify-items: center;
 }
 
 .mock-toggle-btn, .mock-off-btn {
@@ -81,8 +87,8 @@
 }
 
 .mock-toggle-btn {
-  background: #000000;
-  color: #ffffff;
+  background: var(--accent-yellow);
+  color: #000000;
 }
 
 .mock-off-btn {
@@ -113,6 +119,18 @@
   box-shadow: 4px 4px 0 #000000;
 }
 
+.scan-btn, .assign-btn {
+  background: var(--accent-yellow);
+}
+
+.voice-btn {
+  background: var(--accent-red);
+  color: #ffffff;
+  display: block;
+  width: min(320px, 100%);
+  margin: 16px auto;
+}
+
 .connect-btn:hover, .assign-btn:hover, .scan-btn:hover, .known-relay-btn:hover, .voice-btn:hover {
   transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0 #000000;
@@ -133,12 +151,49 @@
   box-shadow: 4px 4px 0 #000000;
 }
 
+.alert-card {
+  background: var(--accent-red);
+  color: #ffffff;
+}
+
+.alert-card .alert-time,
+.alert-card .alert-ttl {
+  color: #ffffff;
+}
+
+.task-card.pending {
+  background: var(--accent-yellow);
+}
+
+.task-card.assigned {
+  background: #ffffff;
+  border-color: var(--accent-red);
+  box-shadow: 4px 4px 0 var(--accent-red);
+}
+
+.task-card .assigned {
+  color: var(--accent-red);
+  font-weight: 900;
+}
+
+.status-item:nth-child(3) {
+  background: var(--accent-red);
+  color: #ffffff;
+}
+
 .device-section h3,
 .task-section h3,
 .alert-list h3,
 .device-section .network-tabs,
 .connected-summary {
   text-align: center;
+  justify-content: center;
+}
+
+.status-item {
+  width: min(360px, 100%);
+  text-align: center;
+  align-items: center;
   justify-content: center;
 }
 

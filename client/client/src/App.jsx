@@ -174,7 +174,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1 className="title">🔵 Dual Mesh SOS + Chat (BLE + WebRTC)</h1>
+      <h1 className="title">🔴 Dual Mesh SOS + Chat (BLE + WebRTC)</h1>
       
       <StatusBar 
         btStatus={btStatus} 
