@@ -14,6 +14,13 @@ const KNOWN_DEVICES = [
 export { KNOWN_DEVICES };
 
 export const useBluetoothMesh = (mockMode = false) => {
+  const getMockStaffName = (id, fallbackName) => {
+    if (id === 'mock1') return 'Staff 1';
+    if (id === 'mock2') return 'Staff 2';
+    if (id === 'mock3') return 'Staff 3';
+    return fallbackName;
+  };
+
   const [devices, setDevices] = useState([]);
   const [connectedDevices, setConnectedDevices] = useState([]);
   const [btStatus, setBtStatus] = useState('disabled');
@@ -53,9 +60,9 @@ export const useBluetoothMesh = (mockMode = false) => {
       if (mockMode) {
         setTimeout(() => {
           setDevices([
-            { id: 'mock1', name: 'Mock BLE Node A', rssi: -65, network: 'BLE' },
-            { id: 'mock2', name: 'Mock BLE Node B', rssi: -72, network: 'BLE' },
-            { id: 'mock3', name: 'Mock BLE Node C', rssi: -58, network: 'BLE' }
+            { id: 'mock1', name: 'Staff 1', rssi: -65, network: 'BLE' },
+            { id: 'mock2', name: 'Staff 2', rssi: -72, network: 'BLE' },
+            { id: 'mock3', name: 'Staff 3', rssi: -58, network: 'BLE' }
           ]);
           setBtStatus('scan-complete');
         }, 2000);
@@ -117,7 +124,11 @@ export const useBluetoothMesh = (mockMode = false) => {
   // Connect to device GATT (mock implementation)
   const connectDevice = useCallback(async (device) => {
     if (device.id.startsWith('mock')) {
-      const peerData = { id: device.id, name: device.name, network: 'BLE' };
+      const peerData = {
+        id: device.id,
+        name: getMockStaffName(device.id, device.name || 'Staff'),
+        network: 'BLE'
+      };
       setConnectedDevices(prev => [...prev, peerData]);
       // Cross-tab sync
       const channel = new BroadcastChannel('mesh-peers');

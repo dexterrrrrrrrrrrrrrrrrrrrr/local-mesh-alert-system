@@ -60,16 +60,15 @@ function App() {
     const handleTask = (event) => {
       if (event.data.type === 'task-update') {
         const task = event.data.task;
-        if (!taskSeenRef.current.has(task.id)) {
+        // Always upsert incoming tasks so manager updates (assign/status) sync.
+        setSharedTasks(prev => {
+          const exists = prev.find(t => t.id === task.id);
+          if (exists) {
+            return prev.map(t => (t.id === task.id ? task : t));
+          }
           taskSeenRef.current.add(task.id);
-          setSharedTasks(prev => {
-            const exists = prev.find(t => t.id === task.id);
-            if (exists) {
-              return prev.map(t => t.id === task.id ? task : t);
-            }
-            return [task, ...prev.slice(0, 50)];
-          });
-        }
+          return [task, ...prev.slice(0, 50)];
+        });
       }
     };
     channel.addEventListener('message', handleTask);

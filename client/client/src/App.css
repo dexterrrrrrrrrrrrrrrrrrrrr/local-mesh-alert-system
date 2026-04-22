@@ -1,289 +1,176 @@
-
-/* SOS Button Perfect Center */
+/* Neobrutalist black & white UI */
 .sos-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 32px 0;
-  padding: 20px;
+  margin: 24px 0;
+  padding: 10px;
 }
 
-/* Professional DeviceList bottom info alignment */
-
-
-.glass-card, .device-section, .alert-list, .task-section {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  border: 1px solid rgba(255,255,255,0.12);
-  padding: 24px;
+.glass-card, .device-section, .alert-list, .task-section,
+.chat-tab, .permissions-modal-content {
+  background: #ffffff;
+  border: 3px solid #000000;
+  border-radius: 0;
+  padding: 20px;
   margin: 16px 0;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  box-shadow: 6px 6px 0 #000000;
 }
 
 .devices-grid, .tasks-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  margin: 20px 0;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin: 16px 0;
 }
 
-.device-card, .task-card, .alert-card {
+.device-card, .task-card, .alert-card, .status-item {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 20px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255,255,255,0.08);
-  transition: all 0.3s ease;
+  gap: 10px;
+  padding: 16px;
+  border: 3px solid #000000;
+  background: #ffffff;
+  box-shadow: 4px 4px 0 #000000;
 }
 
-.known-devices {
-  margin: 20px 0;
-  padding: 20px;
-  background: rgba(0,184,148,0.1);
-  border-radius: 20px;
-  border: 1px solid rgba(0,184,148,0.3);
+.known-devices, .webrtc-info-container, .webrtc-info, .mock-info, .instructions {
+  padding: 16px;
+  margin: 16px 0;
+  background: #f2f2f2;
+  border: 3px solid #000000;
+  box-shadow: 4px 4px 0 #000000;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
 }
 
 .known-devices h4 {
-  margin-bottom: 16px;
-  color: #4ecdc4;
-  font-size: 1.2em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin-bottom: 12px;
+  color: #000000;
+  text-align: center;
 }
 
 .known-relays {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-}
-
-.known-relay-btn {
-  background: linear-gradient(135deg, #00b894, #00cec9);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.95em;
-  white-space: nowrap;
-  box-shadow: 0 8px 25px rgba(0,184,148,0.3);
-}
-
-
-.webrtc-info-container {
-  display: flex;
-  flex-direction: column;
+  gap: 10px;
   justify-content: center;
   align-items: center;
-  text-align: center;
-  padding: 20px;
-  margin: 20px 0;
-  background: rgba(116, 185, 255, 0.1);
-  backdrop-filter: blur(15px);
-  border-radius: 20px;
-  border: 1px solid rgba(116, 185, 255, 0.3);
-  box-shadow: 0 8px 25px rgba(116, 185, 255, 0.15);
 }
 
-.scan-btn {
-  background: var(--primary-gradient);
-
-  color: white;
-  border: none;
-  padding: 16px 32px;
-  border-radius: 50px;
-  font-size: 1.1em;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 30px rgba(102,126,234,0.4);
-  width: 100%;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* WebRTC info + Mock info - Professional glass cards */
-.webrtc-info, .mock-info {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(15px);
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.15);
-  padding: 20px;
-  margin: 16px 0;
-  text-align: center;
-  font-size: 1em;
-  color: #e0e0e0;
-  line-height: 1.6;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.webrtc-info {
-  border-left: 4px solid #74b9ff;
-}
-
-.mock-info {
-  border-left: 4px solid #fdcb6e;
-}
-
-.webrtc-info p, .mock-info p {
-  margin: 8px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-weight: 500;
-}
-
-/* StatusBar perfect grid */
 .status-bar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  padding: 20px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 24px;
-  margin-bottom: 24px;
-  align-items: start;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-
-.status-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 30px;
-  white-space: nowrap;
-  font-weight: 600;
-  font-size: 0.9em;
-  justify-content: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  min-height: 48px;
-  border: 1px solid rgba(255,255,255,0.15);
-  animation: statusPulse 2s ease-in-out infinite;
-}
-
-@keyframes statusPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(255,255,255,0.2);
-  }
-}
-
-
-.connect-btn, .assign-btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 50px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
+.mock-toggle-btn, .mock-off-btn {
+  width: 100%;
+  min-height: 46px;
+  border: 3px solid #000000;
+  border-radius: 0;
+  padding: 10px 14px;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 0.9em;
+  letter-spacing: 0.7px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #000000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mock-toggle-btn {
+  background: #000000;
+  color: #ffffff;
+}
+
+.mock-off-btn {
+  background: #ffffff;
+  color: #000000;
+}
+
+.mock-toggle-btn:hover, .mock-off-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000000;
+}
+
+.mock-toggle-btn:active, .mock-off-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #000000;
+}
+
+.connect-btn, .assign-btn, .scan-btn, .known-relay-btn, .voice-btn,
+.task-input button, .message-input button {
+  background: #ffffff;
+  color: #000000;
+  border: 3px solid #000000;
+  border-radius: 0;
+  padding: 10px 16px;
+  font-weight: 800;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 #000000;
+}
+
+.connect-btn:hover, .assign-btn:hover, .scan-btn:hover, .known-relay-btn:hover, .voice-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000000;
+}
+
+.connect-btn:active, .assign-btn:active, .scan-btn:active, .known-relay-btn:active, .voice-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #000000;
 }
 
 .location-info {
-  background: rgba(0,184,148,0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 16px;
+  background: #f2f2f2;
+  border: 3px solid #000000;
+  border-radius: 0;
+  padding: 14px;
   text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(0,184,148,0.3);
   margin: 16px 0;
+  box-shadow: 4px 4px 0 #000000;
 }
 
-.voice-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  padding: 16px 32px;
-  border-radius: 50px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin: 16px 0;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 30px rgba(102,126,234,0.4);
-  width: 100%;
-}
-
-.instructions {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 24px;
+.device-section h3,
+.task-section h3,
+.alert-list h3,
+.device-section .network-tabs,
+.connected-summary {
   text-align: center;
-  opacity: 0.9;
-  margin-top: 32px;
+  justify-content: center;
 }
 
-/* Responsive mobile */
-@media (max-width: 768px) {
-  .app {
-    padding: 12px;
-  }
-  
-  .glass-card, .device-section, .alert-list, .task-section {
-    padding: 20px;
-    margin: 12px 0;
-  }
-  
-  .status-bar {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  
-  .status-item {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .known-relays {
-    justify-content: center;
-    gap: 8px;
-  }
-  
-  .webrtc-info, .mock-info {
-    padding: 16px;
-    margin: 12px 0;
-  }
+.task-input input, select, textarea, input {
+  background: #ffffff;
+  color: #000000;
+  border: 3px solid #000000;
+  border-radius: 0;
+  padding: 10px 12px;
+  font-weight: 700;
 }
 
-/* Smooth scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.05);
-  border-radius: 4px;
+  background: #ffffff;
+  border-left: 2px solid #000000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
-  border-radius: 4px;
+  background: #000000;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.4);
+@media (max-width: 768px) {
+  .glass-card, .device-section, .alert-list, .task-section, .chat-tab {
+    padding: 14px;
+  }
+
+  .status-bar {
+    grid-template-columns: 1fr;
+  }
 }
 

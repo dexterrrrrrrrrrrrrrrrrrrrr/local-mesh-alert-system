@@ -1,4 +1,4 @@
-/* Advanced Chat UI Styles - Compatible with existing glassmorphism */
+/* Chat styling adapted to black/white neobrutalism */
 
 
 
@@ -7,11 +7,10 @@
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border: 3px solid #000000;
+  border-radius: 0;
+  box-shadow: 6px 6px 0 #000000;
   overflow: hidden;
 }
 
@@ -25,32 +24,33 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #f2f2f2;
+  border-bottom: 3px solid #000000;
 }
 
 
 .tab-btn {
   padding: 0.5rem 1.5rem;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.7);
-  border: none;
-  border-radius: 25px;
+  background: #ffffff;
+  color: #000000;
+  border: 3px solid #000000;
+  border-radius: 0;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 800;
   transition: all 0.3s ease;
   font-size: 0.95rem;
+  box-shadow: 4px 4px 0 #000000;
 }
 
 .tab-btn.active, .tab-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: #000000;
+  color: #ffffff;
   transform: translateY(-2px);
 }
 
 
 .tab-divider {
-  color: rgba(255, 255, 255, 0.3);
+  color: #000000;
   font-weight: bold;
   align-self: center;
   margin: 0 0.5rem;
@@ -116,36 +116,36 @@
 .peer-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  color: white;
+  color: #ffffff;
   font-size: 1rem;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 3px 3px 0 #000000;
+  border: 2px solid #000000;
 }
 
 .message-bubble {
   padding: 1rem 1.25rem;
-  border-radius: 22px;
+  border-radius: 0;
   max-width: 100%;
   word-wrap: break-word;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 4px 4px 0 #000000;
   position: relative;
+  border: 3px solid #000000;
 }
 
 .message-bubble.received {
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-  border-bottom-left-radius: 8px;
+  background: #ffffff;
+  color: #000000;
 }
 
 .message-bubble.sent {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border-bottom-right-radius: 8px;
+  background: #000000;
+  color: #ffffff;
 }
 
 .message-text {
@@ -167,7 +167,7 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: rgba(255, 255, 255, 0.8);
+  color: #000000;
   text-align: center;
 }
 
@@ -188,7 +188,8 @@
   align-items: flex-end;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: #f2f2f2;
+  border-top: 3px solid #000000;
 }
 
 .message-textarea {
@@ -196,25 +197,25 @@
   min-height: 44px;
   max-height: 120px;
   padding: 0.75rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 25px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  border: 3px solid #000000;
+  border-radius: 0;
+  background: #ffffff;
+  color: #000000;
   font-size: 1rem;
   resize: none;
-  backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+  font-weight: 700;
 }
 
 .message-textarea:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.15);
+  border-color: #000000;
+  box-shadow: 4px 4px 0 #000000;
+  background: #ffffff;
 }
 
 .message-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: #444444;
 }
 
 .message-textarea:disabled {
@@ -231,44 +232,40 @@
 .emoji-btn, .send-btn {
   width: 44px;
   height: 44px;
-  border: none;
-  border-radius: 50%;
+  border: 3px solid #000000;
+  border-radius: 0;
   cursor: pointer;
   font-size: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   flex-shrink: 0;
+  box-shadow: 3px 3px 0 #000000;
 }
 
 .emoji-btn {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: #ffffff;
+  color: #000000;
 }
 
 .emoji-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
+  transform: translate(-2px, -2px);
 }
 
 .send-btn {
-  background: linear-gradient(135deg, #00b894, #00cec9);
-  color: white;
+  background: #000000;
+  color: #ffffff;
   font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
 }
 
 .send-btn:hover:not(:disabled) {
-  transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 184, 148, 0.5);
+  transform: translate(-2px, -2px);
 }
 
 .send-btn.disabled {
-  background: #95a5a6;
+  background: #999999;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
 .input-status {
@@ -279,16 +276,17 @@
 }
 
 .input-status.connected {
-  color: #00ff88;
+  color: #000000;
 }
 
 .input-status.disconnected {
-  color: #ff6b6b;
+  color: #000000;
+  text-decoration: underline;
 }
 
 .char-count {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: #222222;
   text-align: right;
   padding: 0 1.5rem 0.5rem;
 }
@@ -310,17 +308,17 @@
 }
 
 .message-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: #ffffff;
   border-radius: 10px;
 }
 
 .message-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: #000000;
   border-radius: 10px;
 }
 
 .message-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: #000000;
 }
 
 /* Responsive */

@@ -1,4 +1,11 @@
 const DeviceList = ({ devices, connectedDevices, onScan, onConnect, knownDevices = [], btStatus, mockMode }) => {
+  const getDisplayName = (device) => {
+    if (device?.id === 'mock1') return 'Staff 1';
+    if (device?.id === 'mock2') return 'Staff 2';
+    if (device?.id === 'mock3') return 'Staff 3';
+    return device?.name || 'Unknown';
+  };
+
   const handleScanClick = () => {
     onScan();
   };
@@ -14,9 +21,9 @@ const DeviceList = ({ devices, connectedDevices, onScan, onConnect, knownDevices
 
   // Mock only for BLE
   const bleDevices = mockMode ? [
-    { id: 'mock1', name: 'Mock Node A', rssi: -65, network: 'BLE' },
-    { id: 'mock2', name: 'Mock Node B', rssi: -72, network: 'BLE' },
-    { id: 'mock3', name: 'Mock Node C', rssi: -58, network: 'BLE' }
+    { id: 'mock1', name: 'Staff 1', rssi: -65, network: 'BLE' },
+    { id: 'mock2', name: 'Staff 2', rssi: -72, network: 'BLE' },
+    { id: 'mock3', name: 'Staff 3', rssi: -58, network: 'BLE' }
   ] : devices.filter(d => d.network === 'BLE');
 
   const allDevices = [...bleDevices, ...devices.filter(d => d.network === 'WebRTC')];
@@ -80,7 +87,7 @@ const DeviceList = ({ devices, connectedDevices, onScan, onConnect, knownDevices
           return (
             <div key={device.id} className={`device-card ${isConnected ? 'connected' : ''} ${device.network?.toLowerCase()}`}>
               <div className="device-name">
-                {device.name} 
+                {getDisplayName(device)} 
                 <span className={`network-badge ${device.network?.toLowerCase()}`}>
                   {device.network === 'BLE' ? '🔵 BLE' : '🌐 WebRTC'}
                 </span>
@@ -101,8 +108,8 @@ const DeviceList = ({ devices, connectedDevices, onScan, onConnect, knownDevices
       {(bleConnected.length > 0 || webrtcConnected.length > 0) && (
         <div className="connected-summary">
           Connected: 
-          {bleConnected.map(d => <span key={d.id} className="peer-tag ble">🔵 {d.name}</span>)}
-          {webrtcConnected.map(d => <span key={d.id} className="peer-tag webrtc">🌐 {d.name}</span>)}
+          {bleConnected.map(d => <span key={d.id} className="peer-tag ble">🔵 {getDisplayName(d)}</span>)}
+          {webrtcConnected.map(d => <span key={d.id} className="peer-tag webrtc">🌐 {getDisplayName(d)}</span>)}
         </div>
       )}
     </div>
