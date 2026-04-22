@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-const SIGNAL_SERVER = window.location.hostname === 'localhost' ? 
-  'ws://localhost:8080' : 
-  window.location.host.includes('vercel.app') ? 
-  'wss://local-mesh-alert-system.onrender.com' :  // Production Render backend
-  'ws://192.168.1.5:8080';
+const SIGNAL_SERVER = import.meta.env.VITE_SIGNALING_URL || 
+  (window.location.hostname === 'localhost' ? 'ws://localhost:8080' : 
+   window.location.host.includes('vercel.app') ? 
+   'wss://local-mesh-alert-system.onrender.com' : 
+   'ws://192.168.1.5:8080');
 
 const ROOM = 'mesh-alerts';
 
