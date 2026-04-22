@@ -12,6 +12,9 @@ import TaskList from './components/TaskList.jsx';
 import './App.css';
 import './components/MessageStyles.css';
 
+const TASKS_STORAGE_KEY = 'mesh-tasks-v2';
+const TASKS_OFFLINE_QUEUE_KEY = 'mesh-tasks-offline-queue-v2';
+
 function App() {
   const [mockMode, setMockMode] = useState(false);
   const bleHook = useBluetoothMesh(mockMode);
@@ -50,30 +53,122 @@ function App() {
   const [hasLocation, setHasLocation] = useState(false);
   const [showPermModal, setShowPermModal] = useState(false);
 
-  const [myRole, setMyRole] = useState('MONITOR');
-  const [sharedTasks, setSharedTasks] = useState([]);
-  const taskSeenRef = useRef(new Set());
+  const [portal, setPortal] = useState('manager');
+  const [staffId, setStaffId] = useState('staff1');
+  const [sharedTasks, setSharedTasks] = useState(() => {
+    try {
+      const raw = localStorage.getItem(TASKS_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [taskNotifications, setTaskNotifications] = useState([]);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   // Task sync BroadcastChannel
   useEffect(() => {
     const channel = new BroadcastChannel('mesh-tasks');
-    const handleTask = (event) => {
-      if (event.data.type === 'task-update') {
-        const task = event.data.task;
-        // Always upsert incoming tasks so manager updates (assign/status) sync.
-        setSharedTasks(prev => {
-          const exists = prev.find(t => t.id === task.id);
-          if (exists) {
-            return prev.map(t => (t.id === task.id ? task : t));
-          }
-          taskSeenRef.current.add(task.id);
-          return [task, ...prev.slice(0, 50)];
-        });
+    const mergeTaskByTimestamp = (prev, incomingTask) => {
+      const existing = prev.find((t) => t.id === incomingTask.id);
+      if (!existing) {
+        return [incomingTask, ...prev].slice(0, 100);
       }
+      const existingTs = new Date(existing.updatedAt || 0).getTime();
+      const incomingTs = new Date(incomingTask.updatedAt || 0).getTime();
+      if (incomingTs <= existingTs) {
+        return prev;
+      }
+      return prev.map((t) => (t.id === incomingTask.id ? incomingTask : t));
     };
+
+    const handleTask = (event) => {
+      if (event.data.type !== 'task-update') return;
+      const task = event.data.task;
+      setSharedTasks((prev) => mergeTaskByTimestamp(prev, task));
+    };
+
     channel.addEventListener('message', handleTask);
     return () => channel.removeEventListener('message', handleTask);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(sharedTasks));
+  }, [sharedTasks]);
+
+  useEffect(() => {
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+    return () => {
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
+  }, []);
+
+  const upsertTask = useCallback((incomingTask, source = 'local') => {
+    setSharedTasks((prev) => {
+      const existing = prev.find((t) => t.id === incomingTask.id);
+      const existingTs = new Date(existing?.updatedAt || 0).getTime();
+      const incomingTs = new Date(incomingTask.updatedAt || 0).getTime();
+
+      if (existing && incomingTs <= existingTs) {
+        return prev;
+      }
+
+      const next = existing
+        ? prev.map((t) => (t.id === incomingTask.id ? incomingTask : t))
+        : [incomingTask, ...prev];
+
+      if (existing) {
+        const justCompleted = Object.keys(incomingTask.statusByStaff || {}).filter((staff) => {
+          const prevStatus = existing.statusByStaff?.[staff] || 'pending';
+          const nextStatus = incomingTask.statusByStaff?.[staff] || 'pending';
+          return prevStatus !== 'completed' && nextStatus === 'completed';
+        });
+        if (justCompleted.length > 0) {
+          setTaskNotifications((prevN) => [
+            ...justCompleted.map((staff) => ({
+              id: `${incomingTask.id}-${staff}-${incomingTask.updatedAt}`,
+              text: `${staff.toUpperCase()} completed "${incomingTask.title}"`,
+              time: incomingTask.updatedAt
+            })),
+            ...prevN
+          ].slice(0, 20));
+        }
+      }
+
+      return next.slice(0, 100);
+    });
+
+    if (source === 'local') {
+      if (isOnline) {
+        const channel = new BroadcastChannel('mesh-tasks');
+        channel.postMessage({ type: 'task-update', task: incomingTask });
+      } else {
+        try {
+          const queued = JSON.parse(localStorage.getItem(TASKS_OFFLINE_QUEUE_KEY) || '[]');
+          queued.push(incomingTask);
+          localStorage.setItem(TASKS_OFFLINE_QUEUE_KEY, JSON.stringify(queued.slice(-200)));
+        } catch {
+          // ignore queue persistence issues
+        }
+      }
+    }
+  }, [isOnline]);
+
+  useEffect(() => {
+    if (!isOnline) return;
+    const channel = new BroadcastChannel('mesh-tasks');
+    try {
+      const queued = JSON.parse(localStorage.getItem(TASKS_OFFLINE_QUEUE_KEY) || '[]');
+      queued.forEach((task) => channel.postMessage({ type: 'task-update', task }));
+      localStorage.removeItem(TASKS_OFFLINE_QUEUE_KEY);
+    } catch {
+      // ignore queue parse errors
+    }
+  }, [isOnline]);
 
   // Geolocation - click retry works
   const getCurrentLocation = useCallback(() => {
@@ -108,6 +203,12 @@ function App() {
     if (btStatus === 'permission-denied') setShowPermModal(true);
   }, [btStatus]);
 
+  const handleSOS = useCallback(async () => {
+    navigator.vibrate?.([200, 100, 200]);
+    bleSendSOS(location);
+    sendWebRTCSOS(location);
+  }, [bleSendSOS, location, sendWebRTCSOS]);
+
   // Voice SOS
   const toggleVoice = useCallback(() => {
     if (voiceRef.current) {
@@ -138,7 +239,7 @@ function App() {
     recognition.start();
     voiceRef.current = recognition;
     setIsVoiceActive(true);
-  }, []);
+  }, [handleSOS]);
 
   const handleScan = async () => {
     try {
@@ -153,13 +254,6 @@ function App() {
     connectDevice(device);
   }, [connectDevice]);
 
-  const handleSOS = async () => {
-    navigator.vibrate?.([200, 100, 200]);
-    bleSendSOS(location);
-    sendWebRTCSOS(location);
-  };
-
-  const deviceId = useRef(`tab_${Math.random().toString(36).slice(-6)}`).current;
   const handleSendMessage = useCallback(async (text) => {
     try {
       bleSendMessage(text);
@@ -214,20 +308,15 @@ function App() {
       <AlertList alerts={allAlerts} />
 
       <TaskList 
-        myRole={myRole}
+        portal={portal}
+        staffId={staffId}
+        onPortalChange={setPortal}
+        onStaffChange={setStaffId}
         connectedDevices={allPeers}
         tasks={sharedTasks}
-        onAssignTask={(task) => {
-          const channel = new BroadcastChannel('mesh-tasks');
-          channel.postMessage({ type: 'task-update', task });
-          setSharedTasks(prev => prev.map(t => t.id === task.id ? task : t));
-        }}
-        onChangeRole={setMyRole}
-        onAddTask={(task) => {
-          const channel = new BroadcastChannel('mesh-tasks');
-          channel.postMessage({ type: 'task-update', task });
-          setSharedTasks(prev => [task, ...prev]);
-        }}
+        isOnline={isOnline}
+        notifications={taskNotifications}
+        onUpsertTask={(task) => upsertTask(task, 'local')}
       />
 
       <ChatTab 
