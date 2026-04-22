@@ -1,4 +1,4 @@
-const DeviceList = ({ devices, connectedDevices, onScan, onConnect, knownDevices = [], btStatus, mockMode }) => {
+const DeviceList = ({ devices, connectedDevices, onScan, onConnect, knownDevices = [], btStatus, connectMode }) => {
   const getDisplayName = (device) => {
     if (device?.id === 'mock1') return 'Staff 1';
     if (device?.id === 'mock2') return 'Staff 2';
@@ -19,8 +19,8 @@ const DeviceList = ({ devices, connectedDevices, onScan, onConnect, knownDevices
     }
   };
 
-  // Mock only for BLE
-  const bleDevices = mockMode ? [
+  // Connect mode for simulated BLE
+  const bleDevices = connectMode ? [
     { id: 'mock1', name: 'Staff 1', rssi: -65, network: 'BLE' },
     { id: 'mock2', name: 'Staff 2', rssi: -72, network: 'BLE' },
     { id: 'mock3', name: 'Staff 3', rssi: -58, network: 'BLE' }
@@ -63,8 +63,8 @@ const DeviceList = ({ devices, connectedDevices, onScan, onConnect, knownDevices
 
         <div className="webrtc-info-container">
           <p>🌐 WebRTC auto-discovers via signaling server (ws://localhost:8080)</p>
-          {mockMode && <p>🧪 Mock BLE peers ready</p>}
-          {!mockMode && <p>Enable Mock or check BT/server</p>}
+          {connectMode && <p>🔗 Connect BLE peers ready</p>}
+          {!connectMode && <p>Enable Connect or check BT/server</p>}
         </div>
 
       </div>
