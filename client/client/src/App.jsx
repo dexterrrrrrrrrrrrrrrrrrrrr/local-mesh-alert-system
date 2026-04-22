@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useAuth } from './contexts/AuthContext.jsx';
 import { useBluetoothMesh } from './services/BluetoothService.js';
 import { KNOWN_DEVICES } from './services/BluetoothService.js';
 import { useWebRTCMesh } from './services/WebRTCMesh.js';
 import StatusBar from './components/StatusBar.jsx';
-import SOSButton from './components/SOSButton.jsx';
+import SOSForm from './components/SOSForm.jsx';
 import AlertList from './components/AlertList.jsx';
 import DeviceList from './components/DeviceList.jsx';
 import PermissionsModal from './components/PermissionsModal.jsx';
@@ -15,9 +16,51 @@ import './components/MessageStyles.css';
 const TASKS_STORAGE_KEY = 'mesh-tasks-v2';
 const TASKS_OFFLINE_QUEUE_KEY = 'mesh-tasks-offline-queue-v2';
 
+function LoginForm({ onLogin }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await onLogin(username, password);
+      setError('');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <h2>🔐 Mesh Portal Login</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Username (manager, staff1-3, guest)"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required={!username === 'guest'}
+        />
+        <button type="submit">Login</button>
+      </form>
+      <p>Demo: manager/admin, staff1/pass, guest/(empty)</p>
+      <div className="error">{error}</div>
+    </div>
+  );
+}
+
 function App() {
-  const [mockMode, setMockMode] = useState(false);
-  const bleHook = useBluetoothMesh(mockMode);
+  const { session, isLoading, login, logout, isAuthed } = useAuth();
+  const [connectMode, setConnectMode] = useState(false);
+  const bleHook = useBluetoothMesh(connectMode);
   const {
     devices: bleDevices,
     connectedDevices: blePeers,
@@ -53,8 +96,8 @@ function App() {
   const [hasLocation, setHasLocation] = useState(false);
   const [showPermModal, setShowPermModal] = useState(false);
 
-  const [portal, setPortal] = useState('manager');
-  const [staffId, setStaffId] = useState('staff1');
+  const portal = session?.role === 'manager' ? 'manager' : session?.role === 'guest' ? 'guest' : 'staff';
+  const staffId = session?.id || 'staff1';
   const [sharedTasks, setSharedTasks] = useState(() => {
     try {
       const raw = localStorage.getItem(TASKS_STORAGE_KEY);
@@ -107,7 +150,7 @@ function App() {
     }
     localStorage.removeItem('mesh-offline-queue');
     setOfflineQueue([]);
-  }, []);
+  }, [sendWebRTCSOS, webrtcSendMessage]);
 
   // Task sync BroadcastChannel
   useEffect(() => {
@@ -246,23 +289,23 @@ function App() {
     if (btStatus === 'permission-denied') setShowPermModal(true);
   }, [btStatus]);
 
-  const handleSOS = useCallback(async () => {
+  const handleSendSOS = useCallback(async (emergencyText) => {
     navigator.vibrate?.([200, 100, 200]);
-    bleSendSOS(location);
+    bleSendSOS(emergencyText);
     if (isOnline) {
-      sendWebRTCSOS(location);
+      sendWebRTCSOS(emergencyText);
     } else {
-      queueAction('sos', { location });
+      queueAction('sos', { location: emergencyText });
       // Show queued notification
       setAlerts(prev => [{
         id: Date.now().toString(),
         type: '📶 SOS Queued (Offline)',
-        location,
+        location: emergencyText,
         time: new Date().toISOString(),
         from: 'SYSTEM'
       }, ...prev.slice(0, 19)]);
     }
-  }, [bleSendSOS, location, sendWebRTCSOS, isOnline, queueAction]);
+  }, [bleSendSOS, sendWebRTCSOS, isOnline, queueAction]);
 
   // Voice SOS
   const toggleVoice = useCallback(() => {
@@ -282,10 +325,10 @@ function App() {
     recognition.interimResults = false;
     recognition.lang = 'en-US';
     recognition.onresult = async (e) => {
-      const text = e.results[e.results.length - 1][0].transcript.toLowerCase();
-      if (text.includes('help') || text.includes('sos') || text.includes('emergency')) {
-        handleSOS();
-        const utterance = new SpeechSynthesisUtterance(`SOS sent to all meshes`);
+      const text = e.results[e.results.length - 1][0].transcript;
+      if (text.toLowerCase().includes('help') || text.toLowerCase().includes('sos') || text.toLowerCase().includes('emergency')) {
+        handleSendSOS(text);
+        const utterance = new SpeechSynthesisUtterance(`SOS "${text}" sent to all meshes (offline queued + sync)`);
         speechSynthesis.speak(utterance);
       }
     };
@@ -294,11 +337,10 @@ function App() {
     recognition.start();
     voiceRef.current = recognition;
     setIsVoiceActive(true);
-  }, [handleSOS]);
+  }, [handleSendSOS, location]);
 
   const handleScan = async () => {
     try {
-      if (!mockMode) await requestBluetooth();
       await scanDevices();
     } catch (err) {
       console.error('Scan failed:', err);
@@ -323,19 +365,34 @@ function App() {
     }
   }, [bleSendMessage, webrtcSendMessage, isOnline, queueAction]);
 
-  const isConnected = allPeers.length > 0 || mockMode;
+  const isConnected = allPeers.length > 0 || connectMode;
+
+  if (isLoading) {
+    return <div className="app loading">Loading Mesh Portal...</div>;
+  }
+
+  if (!isAuthed) {
+    return (
+      <div className="app">
+        <LoginForm onLogin={login} />
+      </div>
+    );
+  }
 
   return (
     <div className="app">
-      <h1 className="title">🔴 Dual Mesh SOS + Chat (BLE + WebRTC)</h1>
+      <div className="header">
+        <h1 className="title">🔴 {session?.role?.toUpperCase() || 'MESH'} Mesh Portal</h1>
+        <button className="logout-btn" onClick={logout}>Logout ({session?.username || 'User'})</button>
+      </div>
       
         <StatusBar 
         btStatus={btStatus} 
         connectedDevices={allPeers} 
         alerts={allAlerts} 
         messages={allMessages}
-        mockMode={mockMode}
-        onToggleMock={() => setMockMode(!mockMode)}
+        connectMode={connectMode}
+        onToggleConnect={() => setConnectMode(!connectMode)}
         isOnline={isOnline}
       />
 
@@ -346,12 +403,10 @@ function App() {
         onConnect={handleConnect}
         knownDevices={KNOWN_DEVICES}
         btStatus={btStatus}
-        mockMode={mockMode}
+        connectMode={connectMode}
       />
 
-      <div className="sos-container">
-        <SOSButton onSOS={handleSOS} isConnected={isConnected} />
-      </div>
+      <SOSForm onSend={handleSendSOS} location={location} />
 
       <button 
         className="voice-btn"
@@ -367,16 +422,15 @@ function App() {
 
       <AlertList alerts={allAlerts} />
 
-      <TaskList 
+        <TaskList 
         portal={portal}
         staffId={staffId}
-        onPortalChange={setPortal}
-        onStaffChange={setStaffId}
         connectedDevices={allPeers}
         tasks={sharedTasks}
         isOnline={isOnline}
         notifications={taskNotifications}
         onUpsertTask={(task) => upsertTask(task, 'local')}
+        session={session}
       />
 
       <ChatTab 

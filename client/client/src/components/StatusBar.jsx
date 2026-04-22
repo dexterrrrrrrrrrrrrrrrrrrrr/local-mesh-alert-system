@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const StatusBar = ({ btStatus, connectedDevices, alerts, messages, mockMode, onToggleMock, isOnline = navigator.onLine }) => {
+const StatusBar = ({ btStatus, connectedDevices, alerts, messages, connectMode, onToggleConnect, isOnline = navigator.onLine }) => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'connected': return '🟢';
@@ -17,9 +17,6 @@ const StatusBar = ({ btStatus, connectedDevices, alerts, messages, mockMode, onT
 
   return (
     <div className="status-bar">
-      <div className="status-item">
-        {getStatusIcon(btStatus)} BT: {btStatus}
-      </div>
       <div className={`status-item ${messages && messages.length > 0 ? 'has-messages' : ''}`}>
         Mesh: {connectedDevices.length} peers 
         <span style={{color: connectedDevices.length > 0 ? '#00ff88' : '#ff6b6b', fontWeight: 'bold'}}>•</span>
@@ -35,28 +32,25 @@ const StatusBar = ({ btStatus, connectedDevices, alerts, messages, mockMode, onT
         {isOnline ? null : <span className="queued-badge" title="Queued messages/SOS">(Q)</span>}
       </div>
       <div className="status-item">
-        🔋 {Math.round(battery)}%
-      </div>
-      <div className="status-item">
-        {mockMode ? '🧪 Mock ON' : '📱 Live'}
-        {mockMode && (
+{connectMode ? '🔗 Connect ON' : '🔌 Connect OFF'}
+        {connectMode && (
           <button 
-            onClick={onToggleMock} 
-            className="mock-off-btn"
-            title="Disable Mock"
+            onClick={onToggleConnect} 
+            className="connect-off-btn"
+            title="Disable Connect"
           >
             OFF
           </button>
         )}
       </div>
-      {!mockMode && (
+      {!connectMode && (
         <div className="status-item">
           <button 
-            onClick={onToggleMock} 
-            className="mock-toggle-btn"
-            title="Enable Mock Mode"
+            onClick={onToggleConnect} 
+            className="connect-toggle-btn"
+            title="Enable Connect Mode"
           >
-            🧪 Mock
+            🔗 Connect
           </button>
         </div>
       )}

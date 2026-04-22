@@ -16,7 +16,8 @@ const TaskList = ({
   tasks = [],
   isOnline,
   notifications = [],
-  onUpsertTask
+  onUpsertTask,
+  session
 }) => {
   const [taskForm, setTaskForm] = useState({
     title: '',
@@ -92,7 +93,10 @@ const TaskList = ({
     }));
   };
 
-  const renderTaskCard = (task, viewer = 'manager') => (
+  const viewerRole = session?.role || 'guest';
+  const viewerId = session?.id || staffId;
+  
+  const renderTaskCard = (task, viewer) => (
     <div key={task.id} className={`task-card ${task.priority}`}>
       <div className="task-text">{task.title}</div>
       <div className="task-meta">Priority: {task.priority.toUpperCase()}</div>
@@ -129,22 +133,7 @@ const TaskList = ({
       <h3>📋 Multi-Role Task Portals</h3>
 
       <div className="role-selector">
-        <label>Portal</label>
-        <select value={portal} onChange={(e) => onPortalChange(e.target.value)}>
-          <option value="manager">Manager Portal</option>
-          <option value="staff">Staff Portal</option>
-          <option value="guest">Guest Portal</option>
-        </select>
-        {portal === 'staff' && (
-          <>
-            <label>Staff Member</label>
-            <select value={staffId} onChange={(e) => onStaffChange(e.target.value)}>
-              {STAFF_OPTIONS.map((staff) => (
-                <option key={staff.id} value={staff.id}>{staff.label}</option>
-              ))}
-            </select>
-          </>
-        )}
+        <div className="task-meta">Current Role: <strong>{viewerRole.toUpperCase()} Portal</strong></div>
         <div className="task-meta">Sync: {isOnline ? 'Online (real-time)' : 'Offline (queued)'}</div>
       </div>
 
