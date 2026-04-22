@@ -1,0 +1,12 @@
+{
+  "name": "mesh-signaling-server",
+  "version": "1.0.0",
+  "description": "Signaling server for WebRTC mesh alerts",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

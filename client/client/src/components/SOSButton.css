@@ -1,0 +1,42 @@
+.sos-btn {
+  padding: clamp(20px, 4vw, 30px) clamp(40px, 8vw, 80px);
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: bold;
+  background: linear-gradient(45deg, #ff416c, #ff4b2b);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 20px 40px rgba(255,65,108,0.4);
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+  min-height: 80px;
+  letter-spacing: 1px;
+  width: 100%;
+  max-width: 350px;
+}
+
+.sos-btn:hover:not(:disabled) {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 25px 50px rgba(255,65,108,0.5);
+}
+
+.sos-btn:active {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.sos-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sos-btn.pressing {
+  background: linear-gradient(45deg, #ffeb3b, #ffc107);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 235, 59, 0.7); }
+  70% { box-shadow: 0 0 0 20px rgba(255, 235, 59, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 235, 59, 0); }
+}
