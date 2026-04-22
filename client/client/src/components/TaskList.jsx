@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 
 const ROLES = {
-  LEADER: '👑 Leader',
-  RELAY: '🔄 Relay',
-  MONITOR: '👀 Monitor',
-  EMERGENCY: '🚨 Emergency'
+  MANAGER: ' Manager',
+  RELAY: ' Relay',
+  MONITOR: ' Monitor',
+  EMERGENCY: ' Emergency'
 };
 
 const DEFAULT_TASKS = [
@@ -49,12 +49,12 @@ const TaskList = ({ myRole, connectedDevices, tasks = DEFAULT_TASKS, onAssignTas
     <div className="task-section">
       <h3>📋 Coordination Tasks ({tasks.length})</h3>
       
-      {myRole === ROLES.LEADER && (
+      {myRole === ROLES.MANAGER && (
         <div className="task-input">
           <input 
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
-            placeholder="New task (Leader only)"
+            placeholder="New task (Manager only)"
             onKeyPress={(e) => e.key === 'Enter' && addTask()}
           />
           <button onClick={addTask}>➕</button>
@@ -77,7 +77,7 @@ Status: {task.status?.toUpperCase() || 'PENDING'}
                 <span className="assigned"> → {connectedDevices.find(d => d.id === task.assignedTo)?.name}</span>
               )}
             </div>
-            {myRole === ROLES.LEADER && !task.assignedTo && (
+            {myRole === ROLES.MANAGER && !task.assignedTo && (
               <div className="assign-buttons">
                 {connectedDevices.map(device => (
                   <button 
