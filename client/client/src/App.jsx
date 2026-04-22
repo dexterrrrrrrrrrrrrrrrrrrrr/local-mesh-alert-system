@@ -65,6 +65,49 @@ function App() {
   });
   const [taskNotifications, setTaskNotifications] = useState([]);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [offlineQueue, setOfflineQueue] = useState([]);
+
+  // Service Worker registration for PWA + offline sync
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('SW registered:', reg))
+        .catch(err => console.log('SW registration failed'));
+      
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data.type === 'SYNC_OFFLINE_DATA') {
+          syncOfflineQueue();
+        }
+      });
+    }
+  }, []);
+
+  // Offline SOS/Message queue
+  const queueAction = useCallback((type, data) => {
+    const queued = {
+      id: Date.now().toString(),
+      type,
+      data,
+      timestamp: Date.now()
+    };
+    setOfflineQueue(prev => [queued, ...prev.slice(0, 50)]);
+    localStorage.setItem('mesh-offline-queue', JSON.stringify([queued, ...offlineQueue.slice(0, 49)]));
+  }, [offlineQueue]);
+
+  const syncOfflineQueue = useCallback(async () => {
+    const stored = JSON.parse(localStorage.getItem('mesh-offline-queue') || '[]');
+    for (const item of stored) {
+      try {
+        if (item.type === 'sos') {
+          sendWebRTCSOS(item.data.location);
+        } else if (item.type === 'message') {
+          webrtcSendMessage(item.data.text);
+        }
+      } catch {}
+    }
+    localStorage.removeItem('mesh-offline-queue');
+    setOfflineQueue([]);
+  }, []);
 
   // Task sync BroadcastChannel
   useEffect(() => {
@@ -206,8 +249,20 @@ function App() {
   const handleSOS = useCallback(async () => {
     navigator.vibrate?.([200, 100, 200]);
     bleSendSOS(location);
-    sendWebRTCSOS(location);
-  }, [bleSendSOS, location, sendWebRTCSOS]);
+    if (isOnline) {
+      sendWebRTCSOS(location);
+    } else {
+      queueAction('sos', { location });
+      // Show queued notification
+      setAlerts(prev => [{
+        id: Date.now().toString(),
+        type: '📶 SOS Queued (Offline)',
+        location,
+        time: new Date().toISOString(),
+        from: 'SYSTEM'
+      }, ...prev.slice(0, 19)]);
+    }
+  }, [bleSendSOS, location, sendWebRTCSOS, isOnline, queueAction]);
 
   // Voice SOS
   const toggleVoice = useCallback(() => {
@@ -257,12 +312,16 @@ function App() {
   const handleSendMessage = useCallback(async (text) => {
     try {
       bleSendMessage(text);
-      webrtcSendMessage(text);
+      if (isOnline) {
+        webrtcSendMessage(text);
+      } else {
+        queueAction('message', { text });
+      }
       navigator.vibrate?.([100]);
     } catch (error) {
       console.error('Send message error:', error);
     }
-  }, [bleSendMessage, webrtcSendMessage]);
+  }, [bleSendMessage, webrtcSendMessage, isOnline, queueAction]);
 
   const isConnected = allPeers.length > 0 || mockMode;
 
@@ -270,13 +329,14 @@ function App() {
     <div className="app">
       <h1 className="title">🔴 Dual Mesh SOS + Chat (BLE + WebRTC)</h1>
       
-      <StatusBar 
+        <StatusBar 
         btStatus={btStatus} 
         connectedDevices={allPeers} 
         alerts={allAlerts} 
         messages={allMessages}
         mockMode={mockMode}
         onToggleMock={() => setMockMode(!mockMode)}
+        isOnline={isOnline}
       />
 
       <DeviceList 

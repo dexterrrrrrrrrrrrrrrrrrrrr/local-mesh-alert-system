@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const StatusBar = ({ btStatus, connectedDevices, alerts, messages, mockMode, onToggleMock }) => {
+const StatusBar = ({ btStatus, connectedDevices, alerts, messages, mockMode, onToggleMock, isOnline = navigator.onLine }) => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'connected': return '🟢';
@@ -13,22 +13,26 @@ const StatusBar = ({ btStatus, connectedDevices, alerts, messages, mockMode, onT
 
   const battery = navigator.getBattery?.()?.level * 100 || 'N/A';
 
+  const netStatus = isOnline ? '🌐' : '📴 Offline';
+
   return (
     <div className="status-bar">
       <div className="status-item">
         {getStatusIcon(btStatus)} BT: {btStatus}
       </div>
       <div className={`status-item ${messages && messages.length > 0 ? 'has-messages' : ''}`}>
-
         Mesh: {connectedDevices.length} peers 
         <span style={{color: connectedDevices.length > 0 ? '#00ff88' : '#ff6b6b', fontWeight: 'bold'}}>•</span>
         {messages && messages.length > 0 && (
           <span className="badge">💬{messages.length}</span>
         )}
-
       </div>
       <div className="status-item">
         🚨 {alerts.length}
+      </div>
+      <div className="status-item">
+        {netStatus}
+        {isOnline ? null : <span className="queued-badge" title="Queued messages/SOS">(Q)</span>}
       </div>
       <div className="status-item">
         🔋 {Math.round(battery)}%
